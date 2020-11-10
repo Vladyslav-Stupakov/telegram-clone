@@ -58,7 +58,7 @@ app.post('/chats', (req, res) => {
     })
 })
 
-app.get('/chats', async (req, res) => {
+app.get('/', async (req, res) => {
     Chat.find((err, data) =>{
         if(err){
             return res.status(500).send({ err })
