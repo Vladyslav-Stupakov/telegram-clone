@@ -1,0 +1,46 @@
+.sidebar{
+    display: flex;
+    flex-direction: column;
+    flex: 0.3;
+    border-right: 1px solid #F1F1F1;
+    min-width: 100px;
+}
+
+.sidebar__header{
+    display: flex;
+    padding: 10px;
+}
+
+.sidebar__headerProfile{
+    margin-right: 5px;
+}
+
+.sidebar__headerSearch{
+    display: flex;
+    min-width: 0;
+    width: 100%;
+}
+.sidebar__headerSearch > input{
+    flex: 1;
+    min-width: 0;
+    outline-color: #54c3f3;
+    border: none;
+    border-radius: 5px;
+    background-color: #F1F1F1;
+    font-size: large;
+    padding-left: 10px;
+}
+.sidebar__headerSearch > input:focus{
+    background-color: #fff;
+}
+
+.sidebar__chats{
+    flex: 1;
+    overflow-y: scroll;
+}
+::-webkit-scrollbar {
+    width: 0px;  
+}
+
+
+

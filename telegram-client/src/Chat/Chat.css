@@ -1,0 +1,78 @@
+.chat{
+    display: flex;
+    flex-direction: column;
+    flex: 0.7;   
+}
+
+.chat__header{
+    border-bottom: 1px solid #F1F1F1;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.chat__headerInfo{
+    flex: 1;
+}
+
+.header__chatName{
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.lastSeen{
+    font-size: 14px;
+}
+
+.chat__body{
+    flex: 1;
+    background-image: url("https://media.istockphoto.com/photos/light-green-defocused-blurred-motion-abstract-background-picture-id1138288758?k=6&m=1138288758&s=612x612&w=0&h=rwNnAXEgmHzxpeb7SY0A2KVMOQhkBaoml1T6HEaW7Fs=");
+    background-position: center;
+    background-repeat: repeat;
+    overflow: scroll;
+}
+::-webkit-scrollbar {
+    width: 0px;  
+}
+
+.timeStamp{
+    color: grey;
+    font-size: 12px; 
+    text-align: right;
+}
+
+.chat__message{
+    padding: 10px;
+    margin: 10px;
+    background-color: white;
+    width: fit-content;
+    border-radius: 10px;
+    max-width: 60%;
+    font-size: 18px;
+}
+.chat__reciever{
+    margin-left: auto;
+    background-color: green;
+}
+
+.chat__footer{
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #F1F1F1;
+}
+
+form{
+    display: flex;
+    flex: 1;
+}
+form > textarea{
+    flex: 1;
+    border: none;
+    outline-color: white; 
+    font-size: 18px;
+    resize: none;
+}
+form > button{
+    display: none;
+}

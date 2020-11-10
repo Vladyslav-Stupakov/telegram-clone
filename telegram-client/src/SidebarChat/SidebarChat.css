@@ -1,0 +1,36 @@
+.sidebarChat{
+    display: flex;
+    cursor: pointer;   
+    padding: 10px;    
+    align-items: center;
+}
+.sidebarChat:hover{
+    background-color: #F1F1F1;
+}
+
+.sidebarChat__info{
+    padding-left: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    height: 45px;
+}
+
+.lastMessage{
+    height: 21px;
+    overflow: hidden;
+    width: 90%;
+    flex: 0 1 auto;
+}
+
+.messageCounter{
+    background-color: #54c3f3;
+    color: white;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.chatName{
+    font-weight: bold;
+}
