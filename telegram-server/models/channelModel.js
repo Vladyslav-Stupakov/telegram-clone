@@ -22,7 +22,7 @@ const channelShema = new mongoose.Schema({
             ref: 'User'
         }
     ],
-    posts: [
+    messages: [
         {
             text: String,
             timestamp: String,

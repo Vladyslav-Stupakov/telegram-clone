@@ -2,9 +2,9 @@ import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
 import auth from './routes/auth.js'
+import chat from './routes/chat.js'
 import Pusher from 'pusher'
-import Chat from './models/chatModel.js'
-import User from './models/userModel.js'
+
 
 const app = express()
 const port = process.env.PORT || 9000
@@ -33,62 +33,9 @@ db.once('open', () => {
 app.use(express.json())
 app.use(cors())
 app.use('/', auth)
-
+app.use('/main', chat);
 
 app.listen(port, () => console.log(`Listening on port ${port}...`))
 
 app.get('/', (req, res) => res.status(200).send('hello'))
 
-app.post('/chats', (req, res) => {
-    const chat = req.body
-    Chat.create(chat, (err, chatData) => {
-        if (err) {
-            return res.status(500).send({ err })
-        }
-        else {
-            User.updateMany({ _id: { $in: chatData.members} }, { $addToSet : { chats:  chatData._id  } }, (err) =>{
-                if(err){
-                    return res.status(500).send({err})
-                }
-                else{
-                    return res.status(200).send({message: 'chat succefully created'})
-                }
-            })
-        }
-    })
-})
-
-app.get('/', async (req, res) => {
-    Chat.find((err, data) =>{
-        if(err){
-            return res.status(500).send({ err })
-        }
-        else{
-            return res.status(200).send({ data })
-        }
-    }).populate('members', ['name', 'surname', '_id']);    
-})
-
-
-app.post('/channel', (req, res) =>{
-    const message = req.body;
-    Chat.updateOne({_id : req.query.id}, { $addToSet : { messages:  message  } }, (err, data) =>{
-        if(err){
-            return res.status(500).send({err})
-        }
-        else{
-            return res.status(201).send({data})
-        }
-    })
-})
-
-app.get('/channel', (req, res) =>{
-    Chat.find((err, data) =>{
-        if(err){
-            return res.status(500).send({ err })
-        }
-        else{
-            return res.status(200).send({ data })
-        }
-    }).populate('members', ['name', 'surname', '_id']);
-})
