@@ -1,7 +1,7 @@
 import express from 'express'
 import bcrypt from 'bcrypt'
 import User from '../models/userModel.js'
-
+import {sendConfirmation} from '../services/emailService.js'
 
 const router = express.Router();
 
@@ -9,13 +9,14 @@ router.post('/register', async(req, res) => {
     const user = req.body
     const salt = await bcrypt.genSalt(10)
     user.password = await bcrypt.hash(user.password, salt)
-    User.create(user, (err, data) => {
+    User.create(user, (err, user) => {
         if (err) {
             if (err.code === 11000)
                 return res.status(422).send({ err: 'Email already in use' })
         }
-        else
-            return res.status(201).send(`user created : ${data}`)
+        else{
+            sendConfirmation(res, user);           
+        }          
     })
 });
 
@@ -35,7 +36,7 @@ router.post('/login', (req, res) => {
                 }
                 else {
                     const token = user.generateAuthToken()
-                    return res.header('x-auth-token', token)
+                    return res.header('x-auth-token', token).send({message: 'logged in'})
                 }
             });
         }        

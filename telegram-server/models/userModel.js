@@ -53,8 +53,12 @@ const userShema = new mongoose.Schema({
 
 });
 
-userShema.methods.generateAuthToken = () => {
-    return jsonwebtoken.sign({ _id, name, surname }, process.env.JwtPrivateKey)
+userShema.methods.generateConfirmationToken = function() {
+    return jsonwebtoken.sign({_id: this._id}, process.env.JWT_PRIVATE_KEY)
+}
+
+userShema.methods.generateAuthToken = function() {
+    return jsonwebtoken.sign({_id: this._id, name: this.name, surname: this.surname}, process.env.JWT_PRIVATE_KEY)
 }
 
 const User = mongoose.model('User', userShema)

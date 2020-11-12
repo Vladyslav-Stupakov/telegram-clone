@@ -9,11 +9,11 @@ import User from '../models/userModel.js';
 const router = express.Router();
 Fawn.init(mongoose);
 
-router.get('/', async (req, res) => {
-    const user = await User.findOne({_id : req.query.id});
-    const channels = await Channel.aggregate([
+router.get('/', logger, async (req, res) => {
+    const user = await User.findOne({ _id: req.user._id });
+    const promises = [Channel.aggregate([
         {
-            $match: { _id: {$in: user.channels} }
+            $match: { _id: { $in: user.channels } }
         },
         {
             $project:
@@ -23,11 +23,11 @@ router.get('/', async (req, res) => {
                 lastMessage: { $arrayElemAt: ["$messages", -1] }
             }
         }
-    ])
-    const chats = await Chat.aggregate([
+    ]).exec(),
+    Chat.aggregate([
         {
-            $match: { _id: {$in: user.chats} }
-        },       
+            $match: { _id: { $in: user.chats } }
+        },
         {
             $lookup: {
                 from: "users",
@@ -46,22 +46,28 @@ router.get('/', async (req, res) => {
                 lastMessage: { $arrayElemAt: ["$messages", -1] },
             }
         },
-    ])
-    let chatsData = chats.concat(channels);
-    chatsData.sort((a, b) =>{
-        if (a.lastMessage.timestamp > b.lastMessage.timestamp) {
-            return -1;
-        }
-        else{
-            if (a.lastMessage.timestamp < b.lastMessage.timestamp) {
-                return 1;
-            }
-            else{
-                return 0;
-            }
-        }
-    })
-    return res.send(chatsData);
+    ]).exec()
+    ]
+    Promise.all(promises)
+        .then((result) => {
+            let data = result.flat().sort((a, b) => {
+                if (a.lastMessage.timestamp > b.lastMessage.timestamp) {
+                    return -1;
+                }
+                else {
+                    if (a.lastMessage.timestamp < b.lastMessage.timestamp) {
+                        return 1;
+                    }
+                    else {
+                        return 0;
+                    }
+                }
+            })
+            return res.send({data})
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 })
 
 router.post('/chats', (req, res) => {

@@ -9,7 +9,7 @@ import Pusher from 'pusher'
 const app = express()
 const port = process.env.PORT || 9000
 
-const conection_url = 'mongodb+srv://vladyslav:a7dGmEdhWFnn4iHZ@cluster0.fwphy.mongodb.net/telegram?retryWrites=true&w=majority'
+const conection_url =  process.env.DB_CONNECTION_STRING
 mongoose.connect(conection_url, {
     useCreateIndex: true,
     useNewUrlParser: true,
@@ -17,9 +17,9 @@ mongoose.connect(conection_url, {
 })
 
 const pusher = new Pusher({
-    appId: "1104557",
-    key: "7c2eabd6eb5ada00a377",
-    secret: "62964ba73b384a5ab1a0",
+    appId: process.env.PUSHER_ID ,
+    key: process.env.PUSHER_KEY ,
+    secret: process.env.PUSHER_SECRET,
     cluster: "eu",
     useTLS: true
 });
