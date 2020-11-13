@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import jsonwebtoken from 'jsonwebtoken'
+import { sendLetter } from '../services/emailService.js'
 
 const userShema = new mongoose.Schema({
     name: {
@@ -31,7 +32,10 @@ const userShema = new mongoose.Schema({
         //     message: `Your password does not match all the requirements`
         // },
     },
-    avatar : String,
+    avatar: {
+        type: String,
+        default: ''
+    },
     channels: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -49,16 +53,43 @@ const userShema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User'
         }
-    ]
+    ],
+    lastSeenAt: {
+        type: String,
+        default: ''
+    },
+    confirmationToken: {
+        tokenString: {
+            type: String,
+            default: ''
+        },
+        expirationDate: Date
+    }
 
 });
 
-userShema.methods.generateConfirmationToken = function() {
-    return jsonwebtoken.sign({_id: this._id}, process.env.JWT_PRIVATE_KEY)
+userShema.methods.sendConfirmation = function (res) {
+    const token = this.generateConfirmationToken()
+    User.findOneAndUpdate({ _id: this._id }, { confirmationToken: token }, { new: true }, (err, user) => {
+        if (err) {
+            console.log('error 1')
+            return res.status(500).send({ err })
+        }
+        else {
+            sendLetter(res, user)
+        }
+    })
 }
 
-userShema.methods.generateAuthToken = function() {
-    return jsonwebtoken.sign({_id: this._id, name: this.name, surname: this.surname}, process.env.JWT_PRIVATE_KEY)
+userShema.methods.generateConfirmationToken = function () {
+    const tokenString = jsonwebtoken.sign({ _id: this._id }, process.env.JWT_PRIVATE_KEY)
+    const expirationDate = new Date()
+    expirationDate.setDate(expirationDate.getDate() + 1)
+    return { tokenString, expirationDate }
+}
+
+userShema.methods.generateAuthToken = function () {
+    return jsonwebtoken.sign({ _id: this._id, name: this.name, surname: this.surname }, process.env.JWT_PRIVATE_KEY)
 }
 
 const User = mongoose.model('User', userShema)

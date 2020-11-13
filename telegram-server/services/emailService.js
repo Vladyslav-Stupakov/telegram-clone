@@ -8,9 +8,8 @@ const transport = nodemailer.createTransport({
     }
 });
 
-export function sendConfirmation(res, user) {
-    const token = user.generateConfirmationToken();
-    const url = `http://localhost:3001/confirm?user=${token}`
+export function sendLetter(res, user) {
+    const url = process.env.URL + `/confirm?token=${user.confirmationToken.tokenString}`
     const mailOptions = {
         from: 'no-reply@telegram-clone',
         to: `${user.email}`,
