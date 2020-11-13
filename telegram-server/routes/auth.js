@@ -22,8 +22,8 @@ router.post('/register', async (req, res) => {
 });
 
 router.patch('/confirm', (req, res) => {
-    const user = jsonwebtoken.verify(req.query.token, process.env.JWT_PRIVATE_KEY)
-    User.findOne({_id: user._id}, (err, user) =>{
+    const token = jsonwebtoken.verify(req.query.token, process.env.JWT_PRIVATE_KEY)
+    User.findOne({_id: token._id}, (err, user) =>{
         if(err){
             return res.status(505).send({ err})
         }
@@ -32,7 +32,15 @@ router.patch('/confirm', (req, res) => {
                 return res.status(200).send({message: 'link expired'})
             }
             else{
-                return res.status(200).send({message: 'email confirmed'})
+                user.varified = true;
+                user.save((err, document, isSaved) =>{
+                    if(err){
+                        return res.status(505).send({ err})
+                    }
+                    else{
+                        return res.status(200).send({message: 'email confirmed'})
+                    }
+                })                   
             }           
         }
     })

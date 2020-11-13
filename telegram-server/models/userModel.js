@@ -69,14 +69,13 @@ const userShema = new mongoose.Schema({
 });
 
 userShema.methods.sendConfirmation = function (res) {
-    const token = this.generateConfirmationToken()
-    User.findOneAndUpdate({ _id: this._id }, { confirmationToken: token }, { new: true }, (err, user) => {
-        if (err) {
-            console.log('error 1')
-            return res.status(500).send({ err })
+    this.confirmationToken = this.generateConfirmationToken()
+    this.save((err, document, isSaved) =>{
+        if(err){
+            return res.status(505).send({ err})
         }
-        else {
-            sendLetter(res, user)
+        else{
+            sendLetter(res, this)
         }
     })
 }
