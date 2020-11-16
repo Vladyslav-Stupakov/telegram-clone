@@ -58,14 +58,7 @@ const userShema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    confirmationToken: {
-        tokenString: {
-            type: String,
-            default: ''
-        },
-        expirationDate: Date
-    }
-
+    confirmationToken: String
 });
 
 userShema.methods.sendConfirmation = function (res) {
@@ -81,10 +74,7 @@ userShema.methods.sendConfirmation = function (res) {
 }
 
 userShema.methods.generateConfirmationToken = function () {
-    const tokenString = jsonwebtoken.sign({ _id: this._id }, process.env.JWT_PRIVATE_KEY)
-    const expirationDate = new Date()
-    expirationDate.setDate(expirationDate.getDate() + 1)
-    return { tokenString, expirationDate }
+    return jsonwebtoken.sign({ _id: this._id }, process.env.JWT_PRIVATE_KEY, {expiresIn: '1 days'})
 }
 
 userShema.methods.generateAuthToken = function () {

@@ -2,7 +2,7 @@ import express from 'express'
 import bcrypt from 'bcrypt'
 import jsonwebtoken from 'jsonwebtoken'
 import User from '../models/userModel.js'
-
+import logger from '../middlewares/logger.js';
 
 const router = express.Router();
 
@@ -21,33 +21,36 @@ router.post('/register', async (req, res) => {
     })
 });
 
+
+router.get('/confirm', (req, res) => {
+    return res.send({ message: 'confirm ur email by clicking on button' })
+})
+
+
 router.patch('/confirm', (req, res) => {
-    const token = jsonwebtoken.verify(req.query.token, process.env.JWT_PRIVATE_KEY)
-    User.findOne({_id: token._id}, (err, user) =>{
-        if(err){
-            return res.status(505).send({ err})
-        }
-        else{
-            if(user.confirmationToken.expirationDate < new Date()){
-                return res.status(200).send({message: 'link expired'})
+    jsonwebtoken.verify(req.query.token, process.env.JWT_PRIVATE_KEY, (err, decoded) => {
+        User.findOne({ _id: decoded._id }, (err, user) => {
+            if (err) {
+                return res.status(505).send({ err })
             }
-            else{
+            else {
                 user.varified = true;
-                user.save((err, document, isSaved) =>{
-                    if(err){
-                        return res.status(505).send({ err})
+                user.save((err, document, isSaved) => {
+                    if (err) {
+                        return res.status(505).send({ err })
                     }
-                    else{
-                        return res.status(200).send({message: 'email confirmed'})
+                    else {
+                        return res.status(200).send({ message: 'email confirmed' })
                     }
-                })                   
-            }           
-        }
+                })
+            }
+        })
     })
+
 });
 
 router.post('/login', (req, res) => {
-    const user = req.body;
+    const requestUser = req.body;
     User.findOne({ email: user.email }, (err, user) => {
         if (err) {
             return res.status(400).send({ err })
@@ -56,13 +59,14 @@ router.post('/login', (req, res) => {
             return res.status(404).send({ message: 'Account does not exis' })
         }
         else {
-            bcrypt.compare(req.body.password, user.password, (err, result) => {
+            bcrypt.compare(requestUser.password, user.password, (err, result) => {
                 if (err) {
                     return res.status(400).send({ message: 'Invalid credentials ' })
                 }
                 else {
                     const token = user.generateAuthToken()
                     return res.header('auth-token', token).send({ message: 'logged in' })
+
                 }
             });
         }

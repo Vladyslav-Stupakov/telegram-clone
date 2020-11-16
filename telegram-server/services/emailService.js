@@ -9,7 +9,7 @@ const transport = nodemailer.createTransport({
 });
 
 export function sendLetter(res, user) {
-    const url = process.env.URL + `/confirm?token=${user.confirmationToken.tokenString}`
+    const url = process.env.URL + `/confirm?token=${user.confirmationToken}`
     const mailOptions = {
         from: 'no-reply@telegram-clone',
         to: `${user.email}`,
