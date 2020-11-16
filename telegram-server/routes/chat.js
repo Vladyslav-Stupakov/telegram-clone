@@ -1,13 +1,11 @@
 import express from 'express'
 import logger from '../middlewares/logger.js';
 import Chat from '../models/chatModel.js'
-import Fawn from 'fawn'
-import mongoose from 'mongoose'
 import Channel from '../models/channelModel.js';
 import User from '../models/userModel.js';
 
 const router = express.Router();
-Fawn.init(mongoose);
+
 
 router.get('/', logger, async (req, res) => {
     const user = await User.findOne({ _id: req.user._id });

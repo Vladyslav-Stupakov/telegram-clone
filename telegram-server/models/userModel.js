@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import jsonwebtoken from 'jsonwebtoken'
 import { sendLetter } from '../services/emailService.js'
+import passportLocalMongoose from 'passport-local-mongoose';
 
 const userShema = new mongoose.Schema({
     name: {
