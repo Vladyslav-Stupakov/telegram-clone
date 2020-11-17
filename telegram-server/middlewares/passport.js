@@ -19,11 +19,19 @@ passport.use(new LocalStrategy({
             }
             bcrypt.compare(password, user.password, (err, result) => {
                 if (err) {
-                    return err
+                    return cb(err, null)
                 }
                 else {
                     if(result){
-                        return cb(null, user);
+                        user.isLogged = true
+                        user.save((err, u) => {
+                            if(err){
+                                return cb(err, null)
+                            }
+                            else{
+                                return cb(null, user)
+                            }
+                        })
                     }
                     else{
                         return cb(null, false)
@@ -34,15 +42,17 @@ passport.use(new LocalStrategy({
     }));
 
 passport.serializeUser((user, cb) => {
-    cb(null, user.id);
+    cb(null, user.id)
 });
 
 passport.deserializeUser((id, cb) => {
     User.findById(id, (err, user) => {
         if (err) {
-            return cb(err);
+            return cb(err)
         }
-        cb(null, user);
+        else{
+            cb(null, user)
+        }      
     });
 });
 

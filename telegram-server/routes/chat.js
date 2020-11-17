@@ -8,7 +8,7 @@ const router = express.Router();
 
 
 router.get('/', logger, async (req, res) => {
-    const user = await User.findOne({ _id: req.user._id });
+    const user = req.user
     const promises = [Channel.aggregate([
         {
             $match: { _id: { $in: user.channels } }

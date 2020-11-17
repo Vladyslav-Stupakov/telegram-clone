@@ -17,7 +17,7 @@ export function sendLetter(res, user) {
         text: `Confirm email by visiting link:   ${url}`
     };
     transport.sendMail(mailOptions, (err, info) => {
-        if (err) {
+        if(err){
             return res.status(500).send({err})
         }
         else{

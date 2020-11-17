@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import jsonwebtoken from 'jsonwebtoken'
-import { sendLetter } from '../services/emailService.js'
-import passportLocalMongoose from 'passport-local-mongoose';
+
+
 
 const userShema = new mongoose.Schema({
     name: {
@@ -59,28 +59,22 @@ const userShema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    confirmationToken: String
+    confirmationToken: String,
+    isLogged: {
+        type: Boolean,
+        default: false
+    },
 });
 
-userShema.methods.sendConfirmation = function (res) {
-    this.confirmationToken = this.generateConfirmationToken()
-    this.save((err, document, isSaved) =>{
-        if(err){
-            return res.status(505).send({ err})
-        }
-        else{
-            sendLetter(res, this)
-        }
-    })
-}
 
 userShema.methods.generateConfirmationToken = function () {
-    return jsonwebtoken.sign({ _id: this._id }, process.env.JWT_PRIVATE_KEY, {expiresIn: '1 days'})
+    this.confirmationToken = jsonwebtoken.sign({ _id: this._id }, process.env.JWT_PRIVATE_KEY, { expiresIn: '1 days' })
+    this.save()
 }
 
-userShema.methods.generateAuthToken = function () {
-    return jsonwebtoken.sign({ _id: this._id, name: this.name, surname: this.surname }, process.env.JWT_PRIVATE_KEY)
-}
+// userShema.methods.generateAuthToken = function () {
+//     return jsonwebtoken.sign({ _id: this._id, name: this.name, surname: this.surname }, process.env.JWT_PRIVATE_KEY)
+// }
 
 const User = mongoose.model('User', userShema)
 
