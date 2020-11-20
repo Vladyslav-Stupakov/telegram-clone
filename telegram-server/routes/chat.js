@@ -61,21 +61,21 @@ router.get('/', logger, async (req, res) => {
                     }
                 }
             })
-            return res.send({data})
+            return res.send({ data })
         })
         .catch((err) => {
             console.log(err);
         });
 })
 
-router.post('/chats', (req, res) => {
+router.post('/addchat', (req, res) => {
     const chat = req.body
-    Chat.create(chat, (err, chatData) => {
+    Chat.create(chat, (err, newChat) => {
         if (err) {
             return res.status(500).send({ err })
         }
         else {
-            User.updateMany({ _id: { $in: chatData.members } }, { $addToSet: { chats: chatData._id } }, (err) => {
+            User.updateMany({ _id: { $in: newChat.members } }, { $addToSet: { chats: newChat._id } }, (err) => {
                 if (err) {
                     return res.status(500).send({ err })
                 }
@@ -86,6 +86,83 @@ router.post('/chats', (req, res) => {
         }
     })
 })
+
+router.patch('/addmember', (req, res) => {
+    const data = req.body
+    const promises = [
+        Chat.findByIdAndUpdate(data.chatId, { $addToSet: { members: data.userId } }),
+        User.findByIdAndUpdate(data.userId, { $addToSet: { chats: data.chatId } })
+    ]
+    Promise.all(promises)
+        .then(() => { res.send({ message: 'new member added to chat' }) })
+        .catch((err) => {
+            console.log(err)
+        })
+})
+
+router.delete('/deletechat', (req, res) => {
+    const data = req.body
+    const promises = [
+        Chat.findByIdAndUpdate(data.chatId, { $pull: { members: data.userId } }),
+        User.findByIdAndUpdate(data.userId, { $pull: { chats: data.chatId } })
+    ]
+    Promise.all(promises)
+        .then(() => { res.send({ message: 'chat deleted' }) })
+        .catch((err) => {
+            console.log(err)
+        })
+})
+
+
+
+router.post('/createchannel', (req, res) => {
+    const chat = req.body
+    Chat.create(chat, (err, newChat) => {
+        if (err) {
+            return res.status(500).send({ err })
+        }
+        else {
+            User.updateMany({ _id: { $in: newChat.members } }, { $addToSet: { chats: newChat._id } }, (err) => {
+                if (err) {
+                    return res.status(500).send({ err })
+                }
+                else {
+                    return res.status(200).send({ message: 'chat succefully created' })
+                }
+            })
+        }
+    })
+})
+
+router.patch('/follow', (req, res) => {
+    const data = req.body
+    const promises = [
+        Chat.findByIdAndUpdate(data.chatId, { $addToSet: { members: data.userId } }),
+        User.findByIdAndUpdate(data.userId, { $addToSet: { chats: data.chatId } })
+    ]
+    Promise.all(promises)
+        .then(() => { res.send({ message: 'new member added to chat' }) })
+        .catch((err) => {
+            console.log(err)
+        })
+    //unfollow
+})
+
+
+router.delete('/deletechannel', (req, res) => {
+    const data = req.body
+    const promises = [
+        Chat.findByIdAndUpdate(data.chatId, { $pull: { members: data.userId } }),
+        User.findByIdAndUpdate(data.userId, { $pull: { chats: data.chatId } })
+    ]
+    Promise.all(promises)
+        .then(() => { res.send({ message: 'chat deleted' }) })
+        .catch((err) => {
+            console.log(err)
+        })
+})
+
+
 
 router.post('/', (req, res) => {
     const message = req.body;
@@ -99,28 +176,5 @@ router.post('/', (req, res) => {
     })
 })
 
-
-router.post('/channel', (req, res) => {
-    const message = req.body;
-    Chat.updateOne({ _id: req.query.id }, { $addToSet: { messages: message } }, (err, data) => {
-        if (err) {
-            return res.status(500).send({ err })
-        }
-        else {
-            return res.status(201).send({ data })
-        }
-    })
-})
-
-router.get('/channel', (req, res) => {
-    Chat.find((err, data) => {
-        if (err) {
-            return res.status(500).send({ err })
-        }
-        else {
-            return res.status(200).send({ data })
-        }
-    }).populate('members', ['name', 'surname', '_id']);
-})
 
 export default router

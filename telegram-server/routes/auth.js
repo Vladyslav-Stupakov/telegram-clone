@@ -12,10 +12,10 @@ router.post('/register', async (req, res) => {
     const user = req.body
     const salt = await bcrypt.genSalt(10)
     user.password = await bcrypt.hash(user.password, salt)
+    console.log(user)
     User.create(user, (err, newUser) => {
         if (err) {
-            if (err.code === 11000)
-                return res.status(422).send({ err: 'Email already in use' })
+            return res.send(err)
         }
         else {
             newUser.generateConfirmationToken()
