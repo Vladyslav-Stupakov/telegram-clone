@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import jsonwebtoken from 'jsonwebtoken'
 
 const chatShema = new mongoose.Schema({
     members: [
@@ -22,11 +23,12 @@ const chatShema = new mongoose.Schema({
             }
         },
     ],
+    link: String
 });
 
-
-chatShema.methods.generateChatLink = () => {
-    return [...Array(20)].map(i => (~~(Math.random() * 36)).toString(36)).join('')
+chatShema.methods.generateLink = function () {
+    this.link = jsonwebtoken.sign({ _id: this._id }, process.env.JWT_PRIVATE_KEY)
+    this.save()
 }
 
 const Chat = mongoose.model('Chat', chatShema)

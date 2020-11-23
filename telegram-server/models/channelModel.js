@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import jsonwebtoken from 'jsonwebtoken'
 
 const channelShema = new mongoose.Schema({
     name: {
@@ -27,17 +28,19 @@ const channelShema = new mongoose.Schema({
             text: String,
             timestamp: String,
             media: [String],
-            author: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User'
-            },
             isRead: {
                 type: Boolean,
                 default: false
             }
         },
-    ]
+    ],
+    link: String
 });
+
+channelShema.methods.generateLink = () =>{
+    this.link = jsonwebtoken.sign({ _id: this._id }, process.env.JWT_PRIVATE_KEY)
+    this.save()
+}
 
 const Channel = mongoose.model('Channel', channelShema)
 

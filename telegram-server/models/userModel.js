@@ -72,6 +72,8 @@ userShema.methods.generateConfirmationToken = function () {
     this.save()
 }
 
+
+
 // userShema.methods.generateAuthToken = function () {
 //     return jsonwebtoken.sign({ _id: this._id, name: this.name, surname: this.surname }, process.env.JWT_PRIVATE_KEY)
 // }
